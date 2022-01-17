@@ -27,3 +27,6 @@ python-socketio==4.2.1
 numpy==1.21.4
 
 imgaug==0.4.0
+
+## Result
+https://www.youtube.com/watch?v=fgMtfUBhtuM
