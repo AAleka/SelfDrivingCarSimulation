@@ -11,21 +11,18 @@ import cv2
 sio = socketio.Server()
 
 app = Flask(__name__)  # '__main__'
-maxSpeed = 20
+maxSpeed = 40
 
 
 def preProcess_white(img):
     img = img[60:135, :, :]
 
-    rec = img
-    rec = cv2.cvtColor(rec, cv2.COLOR_RGB2BGR)
-
     img = cv2.GaussianBlur(img, (5, 5), 0)
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    low_white = np.array([0, 40, 70])  # np.array([100, 40, 70])
-    up_white = np.array([255, 83, 75])  # np.array([125, 83, 75])
+    low_white = np.array([100, 40, 70])  # np.array([100, 40, 70])
+    up_white = np.array([135, 83, 75])  # np.array([125, 83, 75])
 
     mask1 = cv2.inRange(hsv, low_white, up_white)
 
@@ -45,10 +42,7 @@ def preProcess_white(img):
         for line in lines:
             x1, y1, x2, y2 = line[0]
             cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.line(rec, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-    cv2.imshow('camera', rec)
-    cv2.waitKey(1)
     img = cv2.resize(img, (200, 66))
 
     img = img / 255
@@ -57,7 +51,7 @@ def preProcess_white(img):
 
 
 def preProcess_yellow(img):
-    rec = img
+
     img = img[60:135, :, :]
 
     img = cv2.GaussianBlur(img, (7, 7), 0)
@@ -77,7 +71,6 @@ def preProcess_yellow(img):
         for line in lines:
             x1, y1, x2, y2 = line[0]
             cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.line(rec, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
     img = cv2.resize(img, (200, 66))
 
@@ -91,7 +84,7 @@ def telemetry(sid, data):
     speed = float(data['speed'])
     image = Image.open(BytesIO(base64.b64decode(data['image'])))
     image = np.asarray(image)
-    image = preProcess_white(image)
+    image = preProcess_yellow(image)
     image = np.array([image])
     steering = float(model.predict(image))
     throttle = 1.0 - speed / maxSpeed - 2*abs(steering)
