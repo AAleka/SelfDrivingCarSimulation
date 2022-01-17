@@ -1,5 +1,8 @@
 # Self Driving Car Simulation
 
+## Result
+https://www.youtube.com/watch?v=fgMtfUBhtuM
+
 ## Download Udacity Simulator
 https://github.com/udacity/self-driving-car-sim
 
@@ -27,6 +30,3 @@ python-socketio==4.2.1
 numpy==1.21.4
 
 imgaug==0.4.0
-
-## Result
-https://www.youtube.com/watch?v=fgMtfUBhtuM
