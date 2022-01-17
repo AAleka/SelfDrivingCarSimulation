@@ -1,5 +1,8 @@
 # Self Driving Car Simulation
 
+## Download Udacity Simulator
+https://github.com/udacity/self-driving-car-sim
+
 ## Import following libraries
 python=3.9
 
