@@ -11,32 +11,38 @@ import cv2
 sio = socketio.Server()
 
 app = Flask(__name__)  # '__main__'
-maxSpeed = 30
+maxSpeed = 30  # 30 15
 
 
 def preProcess_white(img):
     img = img[60:135, :, :]
 
-    rec = img
-    rec = cv2.cvtColor(rec, cv2.COLOR_RGB2BGR)
+    # rec = img
+    # rec = cv2.cvtColor(rec, cv2.COLOR_RGB2BGR)
 
-    img = cv2.GaussianBlur(img, (5, 5), 0)
+    img = cv2.GaussianBlur(img, (3, 3), 0)
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    low_white = np.array([0, 40, 70])  # np.array([100, 40, 70])
-    up_white = np.array([255, 83, 75])  # np.array([125, 83, 75])
+    low_white = np.array([100, 60, 71])  # [0, 40, 70] [103, 50, 64] [91, 44, 72]
+    up_white = np.array([120, 110, 90])  # [255, 83, 75] [113, 90, 78] [116, 100, 110]
 
     mask1 = cv2.inRange(hsv, low_white, up_white)
+
+    low_white = np.array([0, 40, 70])
+    up_white = np.array([255, 83, 75])
+
+    mask2 = cv2.inRange(hsv, low_white, up_white)
 
     sensitivity = 65
 
     low_white = np.array([0, 0, 255 - sensitivity])  # np.array([0, 0, 255 - sensitivity])
     up_white = np.array([230, sensitivity, 255])  # np.array([230, sensitivity, 255])
 
-    mask2 = cv2.inRange(hsv, low_white, up_white)
+    mask3 = cv2.inRange(hsv, low_white, up_white)
 
     masks = cv2.add(mask1, mask2)
+    masks = cv2.add(mask3, masks)
 
     edges = cv2.Canny(masks, 50, 120)
 
@@ -45,10 +51,10 @@ def preProcess_white(img):
         for line in lines:
             x1, y1, x2, y2 = line[0]
             cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.line(rec, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            # cv2.line(rec, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-    cv2.imshow('camera', rec)
-    cv2.waitKey(1)
+    # cv2.imshow('camera', rec)
+    # cv2.waitKey(1)
     img = cv2.resize(img, (200, 66))
 
     img = img / 255
@@ -92,11 +98,14 @@ def telemetry(sid, data):
     image = Image.open(BytesIO(base64.b64decode(data['image'])))
     image = np.asarray(image)
     image = preProcess_yellow(image)
+    # image = preProcess_white(image)
     image = np.array([image])
     steering = float(model.predict(image))
-    throttle = 1.0 - speed / maxSpeed - 2*abs(steering)
+    throttle = 1.0 - speed / maxSpeed - 2*abs(steering)  # first
+    # throttle = 1.0 - speed / maxSpeed  # second
     # print('{} {} {}'.format(steering, throttle, speed))
-    sendControl(steering, throttle)
+    sendControl(steering, throttle)  # first
+    # sendControl(steering*1.95, throttle)  # second
 
 
 @sio.on('connect')
